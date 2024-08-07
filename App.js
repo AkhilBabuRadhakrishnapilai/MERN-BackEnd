@@ -7,13 +7,13 @@ const app = express();
 const mongoose = require('mongoose');
 const { error } = require('console');
 
+const userRoutes = require('./Routes/userRoutes');
 
 //middleware common
 app.use(bodyParser.json());
 
 //sign and login
-
-
+app.use('/flights/users/',userRoutes);
 //Travel Agent
 
 //Customers
