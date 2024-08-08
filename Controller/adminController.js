@@ -168,3 +168,5 @@ exports.addFlightDetails = addFlightDetails;
 exports.editFlightDetails = editFlightDetails;
 exports.disableFlightDetails = disableFlightDetails;
 exports.displayFlightDetails = displayFlightDetails;
+exports.displayBookings = displayBookings;
+exports.editBookings = editBookings;
