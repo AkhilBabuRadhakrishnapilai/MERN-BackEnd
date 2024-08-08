@@ -1,8 +1,9 @@
-const mongoose = require('momgoose');
+const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const bookingSchema = new Schema({
     userId :{type:String,required:true},
+    flightId : {type:String,required:true},
     startingDate :{type:Date,required:true},
     routeId : {type:String,required:true},
     totalPrice:{type:Number,required:true},
