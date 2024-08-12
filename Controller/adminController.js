@@ -5,6 +5,10 @@ const {validationResult} = require('express-validator');
 const FlightDetails = require('../Models/FlightDetails');
 //booking details Schema
 const BookingDetails = require('../Models/Booking');
+//flights details
+const Flights =  require('../Models/Flights');
+//routes 
+const Routes = require('../Models/flightRoutes');
 
 //add flight Details
 const addFlightDetails = async (req,res,next) =>{
@@ -160,7 +164,170 @@ const editBookings = async (req,res,next)=>{
 
 //Generate Reports
 
+//add flights
+const addFlights = async (req,res,next)=>{
 
+
+    const details = req.body;
+    let existingFlight;
+    const flightId = details.flightId;
+    try{
+        existingFlight = await Flights.findOne({flightId:flightId});
+    }
+    catch(err){
+        console.log(err);
+        const error = new HttpError('Flight already exists.....!',500);
+        return next(error);
+    }
+
+    if(!existingFlight){
+        const flight = new Flight({
+            flightId : details.flightId,
+            flightName : details.flightName,
+            totalSeat : details.totalSeat,
+            economySeat : details.economySeat,
+            businessSeat : details.businessSeat
+        })
+
+        try{
+            await flight.save();
+        }
+        catch(err){
+            console.log(err);
+            const error = new HttpError('Something went wrong,please try again',500);
+            return next(error);
+        }
+
+        res.status(201).json({flight:flight.toObject({getters:true})});
+    }
+}
+//edit flights
+const editFlights= async (req,res,next)=>{
+    const details = req.body;
+    const fliId = req.params.fid;
+    let flight;
+    try{
+        flight = await Flights.findById(fliId);
+    }
+    catch(err){
+        console.log(err);
+        const error = new HttpError('Something went wrong..Please try again...!',500);
+        return next(error);
+    }
+    flight.flightId = details.flightId;
+    flight.flightName = details.flightName;
+    flight.totalSeat = details.totalSeat;
+    flight.economySeat = details.economySeat;
+    flight.businessSeat = details.businessSeat;
+
+    try{
+        await flight.save();
+    }
+    catch(err){
+        console.log(err);
+        const error = new HttpError('something went wrong...Try again',500);
+        return next(error);
+    }
+
+    res.status(200).json({flights:flight.toObject({getters:true})});
+}
+//disable flights
+const disableFlights= async (req,res,next)=>{
+    const fliId = req.params.fid;
+    let flight;
+    try{
+        flight = await Flights.findById(fliId);
+    }
+    catch(err){
+        console.log(err);
+        const error = new HttpError('Something wrong occurred...PLease try again...!',500)
+        return next(error);
+    }
+    flight.isActive = false;
+
+    try{
+        await flight.save();
+    }
+    catch(err){
+        console.log(err);
+        const error = new HttpError('Something wrong occurred,Please try again',500);
+        return next(error);
+    }
+
+    res.status(200).json({message:"Deleted Sucessfully...!"})
+}
+//add routes
+const addRoutes = async (req,res,next)=>{
+    const routeDetails = req.body;
+    const route = new Routes({
+        departure : routeDetails.departure,
+        arrival : routeDetails.arrival,
+        price : routeDetails.price
+    })
+
+    try{
+        await route.save();
+    }
+    catch(err){
+        console.og(err);
+        const error = new HttpError('Something went wrong,please try again',500);
+        return next(error);
+    }
+
+    res.status(200).json({route:route.toObject({getters:true})});
+}
+// edit routes
+const editRoutes = async (req,res,next)=>{
+    const routeDetails = req.body;
+    const routeId = req.params.rid;
+    let route;
+    try{
+        route = await Routes.findById(routeId);
+    }
+    catch(err){
+        console.log(err);
+        const error = new HttpError(`Could'nt find the route,please try again...!`,500);
+        return next(error);
+    }
+    route.departure = routeDetails.departure;
+    route.arrival = routeDetails.arrival;
+    route.price = routeDetails.price;
+
+    try{
+        await route.save();
+    }
+    catch(err){
+        cosole.log(err);
+        const error = new HttpError('something went wrong,please try again',500);
+        return next(error);
+    }
+
+    res.status(200).json({route:route.toObject({getters:true})});
+}
+//disbale routes
+const disableRoutes = async (req,res,next)=>{
+    const routeId = req.param.rid;
+    let route;
+    try{
+        route = await Routes.findById(routeId);
+    }
+    catch(err){
+        console.log(err);
+        const error = new HttpError('Route not found,please try again',500);
+        return next(error)
+    }
+    route.isActive = false;
+    try{
+        await route.save();
+    }
+    catch(err){
+        console.log(err);
+        const error = new HttpError('something went wrong,Please try again',500);
+        return next(error);
+    }
+
+    res.status(200).json({message:"Deleted successfully...!"})
+}
 
 
 
@@ -170,3 +337,10 @@ exports.disableFlightDetails = disableFlightDetails;
 exports.displayFlightDetails = displayFlightDetails;
 exports.displayBookings = displayBookings;
 exports.editBookings = editBookings;
+exports.addFlights = addFlights;
+exports.editFlights = editFlights;
+exports.disableFlights = disableFlights;
+exports.addRoutes = addRoutes;
+exports.editRoutes = editRoutes;
+exports.disableRoutes = disableRoutes;
+

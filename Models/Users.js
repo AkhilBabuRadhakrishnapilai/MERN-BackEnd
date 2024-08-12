@@ -6,7 +6,7 @@ const userSchema = new Schema({
     lastName : {type:String,required:false},
     email:{type:String,required:true,unique:true},
     password:{type:String,required:true,minlength:6},
-    contactNumber:{type:String,required:true,unique:true,minlength:14},
+    contactNumber:{type:String,required:true,unique:true,maxlength:14},
     roleId :{type:String,default:2},
     isActive:{type:Boolean,default:true}
 })
