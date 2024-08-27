@@ -9,6 +9,24 @@ const BookingDetails = require('../Models/Booking');
 const Flights =  require('../Models/Flights');
 //routes 
 const Routes = require('../Models/flightRoutes');
+//role
+const Roles = require('../Models/Roles.js');
+//airports
+const Airports = require('../Models/airports.js');
+//category
+const Category = require('../Models/Category.js');
+//flight type
+const FlightType = require('../Models/flightType.js');
+//payment details
+const PaymentDetails = require('../Models/paymentDetails.js');
+//Profile
+const Profile = require('../Models/Profile.js');
+//Seats
+const Seats = require('../Models/Seats.js');
+//Travel Type
+const TravelType = require('../Models/TravelType.js');
+//class SChema
+const seatClass = require('../Models/class.js');
 
 //add flight Details
 const addFlightDetails = async (req,res,next) =>{
@@ -98,19 +116,24 @@ const disableFlightDetails = async (req,res,next)=>{
 
     res.status(200).json({messgae:"Deleted Successfully....!"})
 }
-//Display all flights
+//Display all flight details
 const displayFlightDetails = async (req,res,next)=>{
+    console.log("reached list");
     let flight;
     try{
-        flight = await FlightDetails.find({isActive:true});
+        flight = await FlightDetails.find({isActive:true}).populate('routeId');
     }
     catch(err){
         console.log(err);
         const error = new HttpError('Something went wrong....',500);
         return next(error);
     }
-
-    res.status(200).json({flightDet:flight.toObject({getters:true})});
+    if(!flight){
+        const error = new HttpError('Something went wronng,Please try again',500);
+        return next(error);
+    }
+    console.log("exiting list method");
+    res.status(200).json({flightdetails:flight.map((value)=>value.toObject({getters:true}))});
 }
 //search flight details
 
@@ -125,8 +148,11 @@ const displayBookings = async (req,res,next)=>{
         const error = new HttpError('Something went wrong....please try again',500);
         return next(error);
     }
-
-    res.status(200).json({booking:ticket.toObject({getters:true})});
+    if(!ticket){
+        const error = new HttpError('something went wrong,Please try again',500);
+        return next(error);
+    }
+    res.status(200).json({tickets:ticket.map((value)=>value.toObject({getters:true}))});
 }
 //Edit boookings 
 const editBookings = async (req,res,next)=>{
@@ -164,6 +190,25 @@ const editBookings = async (req,res,next)=>{
 
 //Generate Reports
 
+//list flights
+const listFlights = async (req,res,next)=>{
+    let flight;
+    try{
+        flight = await Flights.find({isActive:true});
+        console.log(flight);
+    }
+    catch(err){
+        console.log(err);
+        const error = new HttpError('Something went wrong,Please try again',500);
+        return next(error);
+    }
+    if(!flight || flight.length===0){
+        const error = new HttpError('something went wrong,flights not found',404);
+        return next(error);
+    }
+
+    res.status(200).json({flights:flight.map((value)=>value.toObject({getters:true}))});
+}
 //add flights
 const addFlights = async (req,res,next)=>{
 
@@ -173,6 +218,7 @@ const addFlights = async (req,res,next)=>{
     const flightId = details.flightId;
     try{
         existingFlight = await Flights.findOne({flightId:flightId});
+        console.log(existingFlight);
     }
     catch(err){
         console.log(err);
@@ -181,7 +227,7 @@ const addFlights = async (req,res,next)=>{
     }
 
     if(!existingFlight){
-        const flight = new Flight({
+        const flight = new Flights({
             flightId : details.flightId,
             flightName : details.flightName,
             totalSeat : details.totalSeat,
@@ -256,6 +302,26 @@ const disableFlights= async (req,res,next)=>{
 
     res.status(200).json({message:"Deleted Sucessfully...!"})
 }
+
+//list routes
+const listRoutes = async (req,res,next)=>{
+    let routes;
+    try{
+        routes = await Routes.find({isActive:true});
+        console.log(routes);
+    }
+    catch(err){
+        console.log(err);
+        const error = new HttpError('Something went wrong',500);
+        return next(error);
+    }
+
+    if(!routes || routes.length===0){
+        const error = new HttpError('Something went wrong,Routes not found',400);
+        return next(error);
+    }
+    res.status(200).json({routes:routes.map((value)=>value.toObject({getters:true}))})
+}
 //add routes
 const addRoutes = async (req,res,next)=>{
     const routeDetails = req.body;
@@ -306,10 +372,13 @@ const editRoutes = async (req,res,next)=>{
 }
 //disbale routes
 const disableRoutes = async (req,res,next)=>{
-    const routeId = req.param.rid;
+    console.log("disable hitted");
+    const routeId = req.params.rid;
+    console.log(routeId);
     let route;
     try{
         route = await Routes.findById(routeId);
+        console.log(route);
     }
     catch(err){
         console.log(err);
@@ -329,14 +398,57 @@ const disableRoutes = async (req,res,next)=>{
     res.status(200).json({message:"Deleted successfully...!"})
 }
 
+//get airport locations
+const getLocations =async(req,res,next)=>{
 
+    let airport;
+    try{
+        airport = await Airports.find({isActive:true});
+        console.log(airport)
+    }
+    catch(err){
+        console.log(err);
+        const error = new HttpError('Somethig went wrong',500)
+        return next(error);
+    }
+    if(!airport && airport.length===0){
+        const error = new HttpError('Airports not found',404);
+        return next(error);
+    }
+    console.log("exiting list of airports");
+    res.status(200).json({airports:airport.map((value)=>value.toObject({getters:true}))});
+}
 
+//travel type
+const travelType = async(req,res,next)=>{
+    let types;
+    try{
+        types = await FlightType.find({isActive:true});
+    }
+    catch(err){
+        console.log(err);
+        const error = new HttpError('Something went wrong',500)
+        return next(error)
+    }
+
+    if(!types){
+        const error = new HttpError('Not Found',400)
+        return next(error)
+    }
+
+    res.status(200).json({types:types.map((value)=>value.toObject({getters:true}))});
+}
+
+exports.travelType = travelType;
+exports.getLocations = getLocations;
+exports.listRoutes = listRoutes;
 exports.addFlightDetails = addFlightDetails;
 exports.editFlightDetails = editFlightDetails;
 exports.disableFlightDetails = disableFlightDetails;
 exports.displayFlightDetails = displayFlightDetails;
 exports.displayBookings = displayBookings;
 exports.editBookings = editBookings;
+exports.listFlights = listFlights;
 exports.addFlights = addFlights;
 exports.editFlights = editFlights;
 exports.disableFlights = disableFlights;

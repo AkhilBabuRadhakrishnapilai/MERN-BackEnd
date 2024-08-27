@@ -6,6 +6,7 @@ const bookingSchema = new Schema({
     flightId : {type:String,required:true},
     startingDate :{type:Date,required:true},
     routeId : {type:String,required:true},
+    seatClassId :{type:String,required:true}, 
     totalPrice:{type:Number,required:true},
     category :{type:String,required:true},
     typeOfTravel : {type:String,required:true},

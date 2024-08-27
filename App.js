@@ -13,11 +13,20 @@ const adminRoutes = require('./Routes/adminRoutes');
 //middleware common
 app.use(bodyParser.json());
 
+//cors header
+app.use((req,res,next)=>{
+    res.setHeader('Access-Control-Allow-Origin','*');
+    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-type, Accept, Authorization');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE');
+   next();
+});
+
 //sign and login
 app.use('/flights/users',userRoutes);
 //Travel Agent
 app.use('/flights/admin',adminRoutes);
 //Customers
+
 
 
 //to handle error on routes
@@ -35,7 +44,7 @@ app.use((error,req,res,next)=>{
     res.json({message:error.message} || 'An unknown error occurred');
 })
 //connection
-mongoose.connect("mongodb+srv://akhilbn4:Qwertyuiop%40123@ams.p0mdg3z.mongodb.net/AMS?retryWrites=true&w=majority&appName=AMS")
+mongoose.connect("mongodb+srv://akhilbn4:Qwertyuiop%40123@ams.p0mdg3z.mongodb.net/AWS?retryWrites=true&w=majority&appName=AMS")
 .then(()=>{
     app.listen(5000);
     console.log('mongoDB connected....!');
